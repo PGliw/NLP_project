@@ -7,7 +7,7 @@ class SpellGuard:
     :param source_of_true list of correct words in our language
     TODO: 1. change source_of_true implementation from list to DAWG
     TODO: 2. use source_of_true DAWG only for lookup
-    TODO: 3. one the word was't found in DAWG then generate all its possible variations (limited by given levenstein)
+    DONE: 3. one the word was't found in DAWG then generate all its possible variations (limited by given levenstein)
     TODO: 4. search the source_of_true DAWG for occurrence of the generated words
     http://norvig.com/spell-correct.html?fbclid=IwAR3aoAGLipRXGTEiPvtWAr1mBOPbZdyxbwZ-QCnQx7ZM4KijCm1tqUxa6zk
     """
