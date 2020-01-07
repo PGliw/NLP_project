@@ -22,8 +22,8 @@ def get_words_from_frequency_file():
     all_words = []
     with open(frequency_words, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        for line in lines[:MAX_LINES]:
-            all_words.append(tuple(line.split(",")))
+        for line in lines[1:MAX_LINES]:
+            all_words.append(tuple(line.strip().split(";")))
     return all_words
 
 
