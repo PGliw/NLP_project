@@ -75,6 +75,7 @@ class SpellGuard:
                     self.source_of_true.extend(line)
 
 
-sg = SpellGuard(['Hanna', 'Anna', 'Nanana', 'nanana', 'na'])
-sg.set_source_of_true_from_file('slownik_mini.txt')
-print(sg.spell_check('panna', 3, None))
+if __name__ == '__main__':
+    sg = SpellGuard(['Hanna', 'Anna', 'Nanana', 'nanana', 'na'])
+    sg.set_source_of_true_from_file('slownik_mini.txt')
+    print(sg.spell_check('panna', 3, None))
