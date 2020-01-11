@@ -3,11 +3,11 @@ import time
 
 import dawg
 
-from .read_write_files import CommaSeparatedFile
+from rw_files.read_write_files import CommaSeparatedDictionary
 
 
 class MyDawg:
-    def __init__(self, file_handler=CommaSeparatedFile()):
+    def __init__(self, file_handler=CommaSeparatedDictionary()):
         self.file_handler = file_handler
 
     def create_dawgs(self, list_of_filepaths, force_pickle=True):
@@ -20,8 +20,8 @@ class MyDawg:
             all_dawgs.append((base_dawg, completion_dawg))
 
             print(
-                f"Created DAWGs {list_of_filepaths.index(file) + 1}/{len(list_of_filepaths)},"
-                f" TIME SPENT: {time.time() - s_time}")
+                f"Created DAWGs {list_of_filepaths.index(file) + 1}/{len(list_of_filepaths)} "
+                f"| TIME: {time.time() - s_time}")
             
             if force_pickle:
                 self.pickle_dawg(f"base_dawg_{list_of_filepaths.index(file) + 1}.pkl", base_dawg)
@@ -30,13 +30,17 @@ class MyDawg:
 
     @staticmethod
     def pickle_dawg(filename, contents):
+        s_time = time.time()
         with open(filename, 'wb') as f:
             pickle.dump(contents, f)
+        print(f"Pickled to {filename} | TIME: {time.time() - s_time}")
 
     @staticmethod
     def unpickle_dawg(filename):
+        s_time = time.time()
         with open(filename, 'rb') as f:
             loaded_obj = pickle.load(f)
+        print(f"Unpickled from {filename} | TIME: {time.time() - s_time}")
         return loaded_obj
 
     @staticmethod
