@@ -1,5 +1,6 @@
 from rw_files.create_dawgs import MyDawg
 from rw_files.read_write_files import CommaSeparatedDictionary
+import  os
 
 if __name__ == '__main__':
     # TO TUTAJ DZIELI SLOWNIK NA MNIEJSZE, ROBI Z NICH DAWGI I PICKLUJE JE DO PLIKOW.

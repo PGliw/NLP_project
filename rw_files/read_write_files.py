@@ -8,13 +8,14 @@ class CommaSeparatedDictionary:
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
         self.filepath = os.path.join(self.abs_path, 'slownik.txt')
 
+
     def split(self):
         with open(self.filepath, 'r', encoding='utf-8') as f:
             lines = f.readlines()
         number_of_files = math.floor(len(lines) / MAX_LINES)
         list_of_created_files = []
         for i in range(number_of_files):
-            filepath = os.path.join(self.filepath, "split_dictionaries", f"slownik_czesc_{i+1}.txt")
+            filepath = os.path.join(self.abs_path, "split_dictionaries", f"slownik_czesc_{i + 1}.txt")
             if i == number_of_files:
                 self._file_action('w', filepath, lines[i * MAX_LINES:])
             else:
