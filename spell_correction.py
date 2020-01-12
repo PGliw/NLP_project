@@ -1,24 +1,43 @@
 import numpy as np
+from rw_files.create_dawgs import MyDawg
+import os
+from canditates_generator import generate_candidates
+
+# number of directed acyclic word graphs pickled in dir rw_files/pickles (base_dawg_n.pkl)
+NUMBER_OF_DAWGS = 11
 
 
-class SpellGuard:
+class SpellingCorrector:
     """
-    This is a naive implementation of this class - it uses brute force lookup and stores correct words as a list
-    :param source_of_true list of correct words in our language
-    TODO: 1. change source_of_true implementation from list to DAWG
-    TODO: 2. use source_of_true DAWG only for lookup
+    Spelling corrector which uses DAWG, and Levenshtein distance
+    DONE: 1. change source_of_true implementation from list to DAWG
+    DONE: 2. use source_of_true DAWG only for lookup
     DONE: 3. one the word was't found in DAWG then generate all its possible variations (limited by given levenstein)
-    TODO: 4. search the source_of_true DAWG for occurrence of the generated words
+    DONE: 4. search the source_of_true DAWG for occurrence of the generated words
     http://norvig.com/spell-correct.html?fbclid=IwAR3aoAGLipRXGTEiPvtWAr1mBOPbZdyxbwZ-QCnQx7ZM4KijCm1tqUxa6zk
     """
 
-    def __init__(self, source_of_true):
-        self.source_of_true = source_of_true
-
-    def levenstein(self, seq1, seq2):
+    def __init__(self, my_dawg=MyDawg()):
         """
-        Source:
-        https://stackabuse.com/levenshtein-distance-and-text-similarity-in-python/
+        :param my_dawg: instance of MyDawg class for dawg unpickling and all dawg operations
+        """
+        self.my_dawg = my_dawg
+        self.abs_path = os.path.abspath(os.path.dirname(__file__))
+        self.filepath = os.path.join(self.abs_path, 'rw_files\\pickles\\')
+
+        # unpickle base dawgs as class members
+        b_dawgs_pickle_names = [f"base_dawg_{i + 1}.pkl" for i in range(NUMBER_OF_DAWGS)]
+        b_dawgs_pickle_files = list(map(lambda file_name: os.path.join(self.filepath, file_name), b_dawgs_pickle_names))
+        self.b_dawgs = [my_dawg.unpickle_dawg(b_dawgs_pickle_file) for b_dawgs_pickle_file in b_dawgs_pickle_files]
+
+        # upickle completion dawgs as class members
+        c_dawgs_pickle_names = [f"completion_dawg_{i + 1}.pkl" for i in range(NUMBER_OF_DAWGS)]
+        c_dawgs_pickle_files = list(map(lambda file_name: os.path.join(self.filepath, file_name), c_dawgs_pickle_names))
+        self.c_dawgs = [my_dawg.unpickle_dawg(c_dawgs_pickle_files) for c_dawgs_pickle_files in c_dawgs_pickle_files]
+
+    def levenshtein(self, seq1, seq2):
+        """
+        Source: https://stackabuse.com/levenshtein-distance-and-text-similarity-in-python/
         :param seq1 string
         :param seq2 string
         :returns leventein distance between seq1 and seq2 (number)
@@ -48,34 +67,36 @@ class SpellGuard:
         # print(matrix)
         return matrix[size_x - 1, size_y - 1]
 
-    def spell_check(self, phrase, l_distance, err_type=None):
+    def check_phrase(self, phrase):
         """
-        Calculates Levenstein distance between phrase and each word from source of true
+        :param phrase: phrase which correctness will be checked
+        :return: True if the phrase is in any of DAWGs, otherwise - false
+        """
+        if True in [self.my_dawg.is_word(b_dawg, phrase) for b_dawg in self.b_dawgs]:
+            return True
+        else:
+            return False
+
+    def correct_phrase(self, phrase, l_distance, search_substution=False, err_type=None):
+        """
         :param phrase - string to be checked
         :param l_distance - max levenstein distance between phrase and each word
+        :param search_substution - boolean that indicates weather substitutions for correct phrase are needed
         :param err_type TODO use error type as parameter
         """
-        distances = [self.levenstein(word, phrase) for word in self.source_of_true]
-        words_with_distances = list(zip(self.source_of_true, distances))
-        return sorted(list(filter(lambda wd: wd[1] <= l_distance, words_with_distances)), key=lambda wd: wd[1])
-
-    def set_source_of_true_from_file(self, file):
-        """
-        Sets the source of true (list of correct words) to match content of given file
-        :param file - file containing all correct word
-        """
-        self.source_of_true = []
-        with open(file, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if ',' in line:
-                    words = line.replace(' ', '').split(',')
-                    self.source_of_true.extend(words)
-                else:
-                    self.source_of_true.extend(line)
+        is_word = self.check_phrase(phrase)
+        if is_word and not search_substution:
+            return True, {}
+        else:
+            candidates = generate_candidates(phrase, l_distance, self.check_phrase)
+            return is_word, candidates
+        # distances = [self.levenstein(word, phrase) for word in self.source_of_true]
+        # words_with_distances = list(zip(self.source_of_true, distances))
+        # return sorted(list(filter(lambda wd: wd[1] <= l_distance, words_with_distances)), key=lambda wd: wd[1])
 
 
 if __name__ == '__main__':
-    sg = SpellGuard(['Hanna', 'Anna', 'Nanana', 'nanana', 'na'])
-    sg.set_source_of_true_from_file('slownik_mini.txt')
-    print(sg.spell_check('panna', 3, None))
+    sg = SpellingCorrector()
+    # res = sg.correct_phrase('Kopp', 2)
+    res = generate_candidates('Kotp', 3, sg.check_phrase)
+    print(res)
