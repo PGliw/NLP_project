@@ -17,12 +17,14 @@ class SpellingCorrector:
     http://norvig.com/spell-correct.html?fbclid=IwAR3aoAGLipRXGTEiPvtWAr1mBOPbZdyxbwZ-QCnQx7ZM4KijCm1tqUxa6zk
     """
 
-    def __init__(self, my_dawg=MyDawg(), word_generator=None):
+    def __init__(self, my_dawg=MyDawg(), word_generator=None, distance_fun=l_dist):
         """
         :param my_dawg: instance of MyDawg class for dawg unpickling and all dawg operations
         :param word_generator: instance of WordGenerator class for generating words
+        :param distance_fun: function (seq1, seq2) -> number which calculates edit distance between seq1 and seq2
         """
         self.my_dawg = my_dawg
+        self.distance_fun = distance_fun
 
         # file paths to unpickle dawgs
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
@@ -54,25 +56,36 @@ class SpellingCorrector:
         else:
             return False
 
-    def correct_phrase(self, phrase, l_distance, search_substitution=False, err_type=None):
+    def correct_phrase(self, phrase, l_distance, search_substitution=False):
         """
         :param phrase - string to be checked
         :param l_distance - max levenstein distance between phrase and each word
         :param search_substitution - boolean that indicates weather substitutions for correct phrase are needed
-        :param err_type TODO use error type as parameter
         """
         is_word = self.check_phrase(phrase)
         if is_word and not search_substitution:
             return True, {}
         else:
             candidates = self.word_generator.generate_candidates(phrase, l_distance)
-            # TODO: fix distances
-            candidates_with_distances = [(cand, l_dist(cand, phrase)) for cand in candidates]
+            candidates_with_distances = [(cand, self.distance_fun(cand, phrase)) for cand in candidates]
             return is_word, sorted(candidates_with_distances, key=lambda tup: tup[1])
 
 
 if __name__ == '__main__':
     sc = SpellingCorrector()
-    # res = sg.correct_phrase('Kopp', 2)
-    res = sc.correct_phrase('Kot', 2, True)
-    print(res)
+
+    # Wybór typu błędu
+    # Wstawiono przypadkowo dodatkową literkę
+    sc.word_generator.is_deleting = True
+    # Zamieniono 2 sąsiadujące litery
+    sc.word_generator.is_transposing = True
+    # Popełniono literówkę (użyto innej litery niż trzeba)
+    sc.word_generator.is_replacing = True
+    # "Zjedzono" literę
+    sc.word_generator.is_inserting = True
+
+    res = sc.correct_phrase('Kot', 1, True)
+
+    # The second value is Optimal string alignment distance, which can be greater than Levenshtein distance!
+    for i, el in enumerate(res[1]):
+        print(i, el)

@@ -5,7 +5,7 @@ class WordGenerator:
     def __init__(self,
                  correct_word_predicate=None,
                  alphabet='aąbcćdeęfghijklmnoópqrsśtuvwxyzźż',
-                 is_splitting=True, is_deleting=True, is_transposing=True,
+                 is_deleting=True, is_transposing=True,
                  is_replacing=True, is_inserting=True):
         """
         :param correct_word_predicate: function (word) -> Boolean. If None than all words are correct.
@@ -18,7 +18,6 @@ class WordGenerator:
         """
         self.correct_word_predicate = correct_word_predicate
         self.alphabet = alphabet
-        self.is_splitting = is_splitting
         self.is_deleting = is_deleting
         self.is_transposing = is_transposing
         self.is_replacing = is_replacing
@@ -69,10 +68,7 @@ class WordGenerator:
         """
         # generate all possible splits of a word
         # eg. "kot" -> [('', 'kot'), ('k', 'ot'), ('ko', 't'), ('kot', '')]
-        if self.is_splitting:
-            splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-        else:
-            splits = []
+        splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
 
         # generate all possible deletions - removing first letter of each right split of the word and adding to left
         # eg. "kot" -> ['ot', 'kt', 'ko']
