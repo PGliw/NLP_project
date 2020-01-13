@@ -2,6 +2,7 @@ from rw_files.create_dawgs import MyDawg
 import os
 from canditates_generator import WordGenerator
 from distance_calculation import damerau_levenshtein_distance as dl_dist, levenshtein_distance as l_dist
+import time
 
 # number of directed acyclic word graphs pickled in dir rw_files/pickles (base_dawg_n.pkl)
 NUMBER_OF_DAWGS = 11
@@ -84,8 +85,54 @@ if __name__ == '__main__':
     # "Zjedzono" literę
     sc.word_generator.is_inserting = True
 
-    res = sc.correct_phrase('Kot', 1, True)
+    # word = 'kott'
+    # edit_distance = 3
+
+    # POBIERANIE Z KLAWIATURY:
+    print()
+    print("*********************************************")
+    print("*******      Witaj w programie         ******")
+    print("*********************************************")
+
+    word = input('Wprowadź słowo: ')
+    edit_distance = int(input('Podaj odległość Levensteina (0-4): '))
+    enter_error_type = input('Czy chcesz wybrać typ błędu? [Y/N]')
+    if enter_error_type.lower() == 'y':
+        print('Wprowadź które z typów będów chcesz poprawić')
+        print('[1] Wstawiono przypadkowo dodatkową literkę')
+        print('[2] Zamieniono 2 sąsiadujące litery')
+        print('[3] Popełniono literówkę (użyto innej litery niż trzeba)')
+        print('[4] "Zjedzono" literę')
+        print('Np. 124 - oznacza opcje 1, 2 i 4 (bez 3)')
+        options = input('Wprowadź numery opcji: ')
+        if '1' in options:
+            sc.word_generator.is_deleting = True
+        else:
+            sc.word_generator.is_deleting = False
+        if '2' in options:
+            sc.word_generator.is_transposing = True
+        else:
+            sc.word_generator.is_transposing = False
+        if '3' in options:
+            sc.word_generator.is_replacing = True
+        else:
+            sc.word_generator.is_replacing = False
+        if '4' in options:
+            sc.word_generator.is_inserting = True
+        else:
+            sc.word_generator.is_inserting = False
+
+    res = sc.correct_phrase(word, edit_distance, True)
 
     # The second value is Optimal string alignment distance, which can be greater than Levenshtein distance!
     for i, el in enumerate(res[1]):
         print(i, el)
+
+    # TEST WYDAJNOŚCI
+    # words = ['Kot', 'aaa', 'Bóbr', 'wraf', 'wierza']
+    # for word in words:
+    #     for dist in range(5):
+    #         start = time.time()
+    #         sc.correct_phrase(word, dist, True)
+    #         end = time.time()
+    #         print("Fraza:", word, ", Odległość:", dist, ", Czas:", end - start)
