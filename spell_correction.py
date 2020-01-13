@@ -2,6 +2,7 @@ from rw_files.create_dawgs import MyDawg
 import os
 from canditates_generator import WordGenerator
 from distance_calculation import damerau_levenshtein_distance as dl_dist, levenshtein_distance as l_dist
+import time
 
 # number of directed acyclic word graphs pickled in dir rw_files/pickles (base_dawg_n.pkl)
 NUMBER_OF_DAWGS = 11
@@ -69,23 +70,3 @@ class SpellingCorrector:
             candidates = self.word_generator.generate_candidates(phrase, l_distance)
             candidates_with_distances = [(cand, self.distance_fun(cand, phrase)) for cand in candidates]
             return is_word, sorted(candidates_with_distances, key=lambda tup: tup[1])
-
-
-if __name__ == '__main__':
-    sc = SpellingCorrector()
-
-    # Wybór typu błędu
-    # Wstawiono przypadkowo dodatkową literkę
-    sc.word_generator.is_deleting = True
-    # Zamieniono 2 sąsiadujące litery
-    sc.word_generator.is_transposing = True
-    # Popełniono literówkę (użyto innej litery niż trzeba)
-    sc.word_generator.is_replacing = True
-    # "Zjedzono" literę
-    sc.word_generator.is_inserting = True
-
-    res = sc.correct_phrase('Kot', 1, True)
-
-    # The second value is Optimal string alignment distance, which can be greater than Levenshtein distance!
-    for i, el in enumerate(res[1]):
-        print(i, el)

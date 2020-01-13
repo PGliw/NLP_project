@@ -1,5 +1,4 @@
-import enum
-
+import time
 
 class WordGenerator:
     def __init__(self,
@@ -7,6 +6,7 @@ class WordGenerator:
                  alphabet='aąbcćdeęfghijklmnoópqrsśtuvwxyzźż',
                  is_deleting=True, is_transposing=True,
                  is_replacing=True, is_inserting=True):
+        # inicjalizacjia atrybutów
         """
         :param correct_word_predicate: function (word) -> Boolean. If None than all words are correct.
         :param alphabet: alphabet used to generate strings from given word
@@ -24,6 +24,7 @@ class WordGenerator:
         self.is_inserting = is_inserting
 
     def generate_candidates(self, word, max_dist):
+        # generowanie możliwych słów
         """
         Generate all strings from the given words and letters from the given alphabet within the given lev_dist from 'word'.
         We assume that distance(word1, word2) = 0 only if word1 == word2.
@@ -59,6 +60,7 @@ class WordGenerator:
         return output_set
 
     def _damerau_levenshtein_edits1(self, word):
+        # generowanie ciągów znaków odległych o 1 od zadanego słowa
         """
         SOURCE: Norvig's article: How to Write a Spelling Corrector.
         LINK: http://norvig.com/spell-correct.html
