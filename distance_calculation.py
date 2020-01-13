@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def damerau_levenshtein_distance(seq1, seq2):
     """
     SOURCE: https://gist.github.com/pombredanne/0d83ad58f45986ddeb0917266e106be0
@@ -12,7 +13,7 @@ def damerau_levenshtein_distance(seq1, seq2):
     INF = len(seq1) + len(seq2)
 
     # Matrix: (M + 2) x (N + 2)
-    matrix  = [[INF for n in range(len(seq2) + 2)]]
+    matrix = [[INF for n in range(len(seq2) + 2)]]
     matrix += [[INF] + list(range(len(seq2) + 1))]
     matrix += [[INF, m] + [0] * len(seq2) for m in range(1, len(seq1) + 1)]
 
@@ -38,20 +39,20 @@ def damerau_levenshtein_distance(seq1, seq2):
             cost = 0 if ch_a == ch_b else 1
 
             # Compute substring distance
-            matrix[row+1][col+1] = min(
-                matrix[row][col] + cost, # Substitution
-                matrix[row+1][col] + 1,  # Addition
-                matrix[row][col+1] + 1,  # Deletion
+            matrix[row + 1][col + 1] = min(
+                matrix[row][col] + cost,  # Substitution
+                matrix[row + 1][col] + 1,  # Addition
+                matrix[row][col + 1] + 1,  # Deletion
 
                 # Transposition
                 # Start by reverting to cost before transposition
                 matrix[last_matching_row][last_match_col]
-                    # Cost of letters between transposed letters
-                    # 1 addition + 1 deletion = 1 substitution
-                    + max((row - last_matching_row - 1),
-                          (col - last_match_col - 1))
-                    # Cost of the transposition itself
-                    + 1)
+                # Cost of letters between transposed letters
+                # 1 addition + 1 deletion = 1 substitution
+                + max((row - last_matching_row - 1),
+                      (col - last_match_col - 1))
+                # Cost of the transposition itself
+                + 1)
 
             # If there was a match, update last_match_col
             if cost == 0:
@@ -95,4 +96,3 @@ def levenshtein_distance(seq1, seq2):
                 )
     # print(matrix)
     return matrix[size_x - 1, size_y - 1]
-

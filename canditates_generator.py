@@ -101,13 +101,3 @@ class WordGenerator:
             inserts = []
 
         return set(deletes + transposes + replaces + inserts)
-
-
-# wg = WordGenerator()
-# words = ['Kot', 'aaa', 'Bóbr', 'wraf', 'wierza']
-# for word in words:
-#     for dist in range(4):
-#         start = time.time()
-#         wg.generate_candidates(word, dist)
-#         end = time.time()
-#         print("Fraza:", word, ", Odległość:", dist,  ", Czas:", end - start)
